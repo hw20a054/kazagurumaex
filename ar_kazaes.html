@@ -1,0 +1,340 @@
+<html>
+
+<head>
+  <title>three.js + ar.js</title>
+  <meta name="viewport" content="width=device-width, viewport-fit=cover, shrink-to-fit=no" />
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+    }
+
+    .wrapper {
+      position: relative;
+      overflow: hidden;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="wrapper">
+    <canvas></canvas>
+  </div>
+  <!--❶ three.jsとAR.jsを読み込む-->
+  <script src="https://unpkg.com/three@0.127.0/build/three.min.js"></script>
+  <script src="https://raw.githack.com/AR-js-org/AR.js/3.3.3/three.js/build/ar.js"></script>
+  <script async>
+    const renderer = new THREE.WebGLRenderer({
+      canvas: document.querySelector('canvas'),
+      antialias: true,
+      alpha: true
+    });
+    const camera = new THREE.PerspectiveCamera();
+    const scene = new THREE.Scene();
+    const markerRoot = new THREE.Group();
+    const arToolkitContext = new THREEx.ArToolkitContext({
+      cameraParametersUrl: './camera.dat', // ❷ camera.datを読み込む
+      detectionMode: 'mono'
+    });
+    const arToolkitSource = new THREEx.ArToolkitSource({
+      sourceType: 'webcam'
+    });
+    const arMarkerControl = new THREEx.ArMarkerControls(arToolkitContext, markerRoot, {
+      type: 'pattern',
+      patternUrl: 'pattern.patt' // ❸ pattern.pattを読み込む
+    });
+
+    renderer.setSize(window.innerWidth, window.innerHeight);
+
+    window.addEventListener('resize', handleResize, {
+      passive: true
+    });
+
+    arToolkitContext.init(() => {
+      camera.projectionMatrix.copy(arToolkitContext.getProjectionMatrix());
+    });
+
+    arToolkitSource.init(() => {
+      document.querySelector('.wrapper').appendChild(arToolkitSource.domElement); // ❹ videoタグを.wrapper配下に移動させる
+      setTimeout(handleResize, 400); // ❺ リサイズイベントを一度発火させる
+    });
+
+    scene.add(markerRoot);
+
+    let redFlg = -1;
+    let greenFlg = -1;
+    let yellowFlg = -1;
+    let blueFlg = -1;
+    let violetFlg = -1;
+
+    //風車の中心を生成
+    const center_geometry = new THREE.BoxGeometry(0.15, 0.1, 0.15);
+    //red風車の中心を生成
+    const red_center_material = new THREE.MeshBasicMaterial({ color: 0xF3F0D9 });
+    const red_center = new THREE.Mesh(center_geometry, red_center_material);
+
+    red_center.position.set(1.5, -0.1, -2.5);
+    red_center.rotation.y = 45;
+    markerRoot.add(red_center);
+
+    //green風車の中心を生成
+    const green_center_material = new THREE.MeshBasicMaterial({ color: 0xF3F0D9 });
+    const green_center = new THREE.Mesh(center_geometry, green_center_material);
+
+    green_center.position.set(-1, -0.1, 0);
+    green_center.rotation.y = 45;
+    markerRoot.add(green_center);
+
+    //yellow風車の中心を生成
+    const yellow_center_material = new THREE.MeshBasicMaterial({ color: 0xF3F0D9 });
+    const yellow_center = new THREE.Mesh(center_geometry, yellow_center_material);
+
+    yellow_center.position.set(1, -0.1, 0);
+    yellow_center.rotation.y = 45;
+    markerRoot.add(yellow_center);
+
+    //blue風車の中心を生成
+    const blue_center_material = new THREE.MeshBasicMaterial({ color: 0xF3F0D9 });
+    const blue_center = new THREE.Mesh(center_geometry, blue_center_material);
+
+    blue_center.position.set(2, -0.1, 0);
+    blue_center.rotation.y = 45;
+    markerRoot.add(blue_center);
+
+    //violet風車の中心を生成
+    const violet_center_material = new THREE.MeshBasicMaterial({ color: 0xF3F0D9 });
+    const violet_center = new THREE.Mesh(center_geometry, violet_center_material);
+
+    violet_center.position.set(-2, -0.1, 0);
+    violet_center.rotation.y = 45;
+    markerRoot.add(violet_center);
+
+
+    //風車の棒を生成
+    const temoti_geometry = new THREE.BoxGeometry(0.15, 3, 0.1);
+    //red風車の棒を生成
+    const red_temoti_material = new THREE.MeshBasicMaterial({ color: 0xD9E3CF });
+    const red_temoti = new THREE.Mesh(temoti_geometry, red_temoti_material);
+
+    red_temoti.position.set(1.5, -1.5, -1.0);
+    red_temoti.rotation.x = 90;
+    red_temoti.name = "OBJECTRED"
+    markerRoot.add(red_temoti);
+
+    //green風車の棒を生成
+    const green_temoti_material = new THREE.MeshBasicMaterial({ color: 0xD9E3CF });
+    const green_temoti = new THREE.Mesh(temoti_geometry, green_temoti_material);
+
+    green_temoti.position.set(-1, -1.5, 1.5);
+    green_temoti.rotation.x = 90;
+    green_temoti.name = "OBJECTGREEN"
+    markerRoot.add(green_temoti);
+
+    //yellow風車の棒を生成
+    const yellow_temoti_material = new THREE.MeshBasicMaterial({ color: 0xD9E3CF });
+    const yellow_temoti = new THREE.Mesh(temoti_geometry, yellow_temoti_material);
+
+    yellow_temoti.position.set(1, -1.5, 1.5);
+    yellow_temoti.rotation.x = 90;
+    yellow_temoti.name = "OBJECTYELLOW"
+    markerRoot.add(yellow_temoti);
+
+    //blue風車の棒を生成
+    const blue_temoti_material = new THREE.MeshBasicMaterial({ color: 0xD9E3CF });
+    const blue_temoti = new THREE.Mesh(temoti_geometry, blue_temoti_material);
+
+    blue_temoti.position.set(2, -1.5, 1.5);
+    blue_temoti.rotation.x = 90;
+    blue_temoti.name = "OBJECTBLUE"
+    markerRoot.add(blue_temoti);
+
+    //violet風車の棒を生成
+    const violet_temoti_material = new THREE.MeshBasicMaterial({ color: 0xD9E3CF });
+    const violet_temoti = new THREE.Mesh(temoti_geometry, violet_temoti_material);
+
+    violet_temoti.position.set(-2, -1.5, 1.5);
+    violet_temoti.rotation.x = 90;
+    violet_temoti.name = "OBJECTVIOLET"
+    markerRoot.add(violet_temoti);
+
+    //風車の花を生成
+    const kazaguruma_geometry = new THREE.TorusKnotGeometry(1 * 0.4, 0.2 * 0.4, 20, 3, 3, 5);
+    //red風車の花を生成
+    const red_kazaguruma_material = new THREE.MeshBasicMaterial({ color: 0xFE3D4D });
+    const red_kazaguruma = new THREE.Mesh(kazaguruma_geometry, red_kazaguruma_material);
+
+    //green風車の花を生成
+    const green_kazaguruma_material = new THREE.MeshBasicMaterial({ color: 0x2EA793 });
+    const green_kazaguruma = new THREE.Mesh(kazaguruma_geometry, green_kazaguruma_material);
+
+    //yellow風車の花を生成
+    const yellow_kazaguruma_material = new THREE.MeshBasicMaterial({ color: 0xE5BC2D });
+    const yellow_kazaguruma = new THREE.Mesh(kazaguruma_geometry, yellow_kazaguruma_material);
+
+    //blue風車の花を生成
+    const blue_kazaguruma_material = new THREE.MeshBasicMaterial({ color: 0x3B94CB });
+    const blue_kazaguruma = new THREE.Mesh(kazaguruma_geometry, blue_kazaguruma_material);
+
+    //violet風車の花を生成
+    const violet_kazaguruma_material = new THREE.MeshBasicMaterial({ color: 0x7971BC });
+    const violet_kazaguruma = new THREE.Mesh(kazaguruma_geometry, violet_kazaguruma_material);
+
+
+
+    //red風車を表示
+    red_kazaguruma.position.set(1.5, 0, -2.5);
+    red_kazaguruma.rotation.x = 90;
+    const redkazagurumaflame_geometry = new THREE.TorusKnotGeometry(1 * 0.4, 0.2 * 0.4, 20, 3, 3, 5);
+    const redkazagurumaflame_material = new THREE.MeshBasicMaterial({ color: 0xFFFFFF });
+    redkazagurumaflame_material.wireframe = true;
+    const redkazagurumaflame = new THREE.Mesh(redkazagurumaflame_geometry, redkazagurumaflame_material);
+    redkazagurumaflame.name = "OBJECTRED";
+    red_kazaguruma.add(redkazagurumaflame);
+    red_kazaguruma.name = "OBJECTRED";
+    markerRoot.add(red_kazaguruma);
+
+    //green風車を表示
+    green_kazaguruma.position.set(-1, 0, 0);
+    green_kazaguruma.rotation.x = 90;
+    const greenkazagurumaflame_geometry = new THREE.TorusKnotGeometry(1 * 0.4, 0.2 * 0.4, 20, 3, 3, 5);
+    const greenkazagurumaflame_material = new THREE.MeshBasicMaterial({ color: 0xFFFFFF });
+    greenkazagurumaflame_material.wireframe = true;
+    const greenkazagurumaflame = new THREE.Mesh(greenkazagurumaflame_geometry, greenkazagurumaflame_material);
+    greenkazagurumaflame.name = "OBJECTGREEN";
+    green_kazaguruma.add(greenkazagurumaflame);
+    green_kazaguruma.name = "OBJECTGREEN";
+    markerRoot.add(green_kazaguruma);
+
+
+    //yellow風車を表示
+    yellow_kazaguruma.position.set(1, 0, 0);
+    yellow_kazaguruma.rotation.x = 90;
+    const yellowkazagurumaflame_geometry = new THREE.TorusKnotGeometry(1 * 0.4, 0.2 * 0.4, 20, 3, 3, 5);
+    const yellowkazagurumaflame_material = new THREE.MeshBasicMaterial({ color: 0xFFFFFF });
+    yellowkazagurumaflame_material.wireframe = true;
+    const yellowkazagurumaflame = new THREE.Mesh(yellowkazagurumaflame_geometry, yellowkazagurumaflame_material);
+    yellowkazagurumaflame.name = "OBJECTYELLOW";
+    yellow_kazaguruma.add(yellowkazagurumaflame);
+    yellow_kazaguruma.name = "OBJECTYELLOW";
+    markerRoot.add(yellow_kazaguruma);
+
+    //blue風車を表示
+    blue_kazaguruma.position.set(2, 0, 0);
+    blue_kazaguruma.rotation.x = 90;
+    const bluekazagurumaflame_geometry = new THREE.TorusKnotGeometry(1 * 0.4, 0.2 * 0.4, 20, 3, 3, 5);
+    const bluekazagurumaflame_material = new THREE.MeshBasicMaterial({ color: 0xFFFFFF });
+    bluekazagurumaflame_material.wireframe = true;
+    const bluekazagurumaflame = new THREE.Mesh(bluekazagurumaflame_geometry, bluekazagurumaflame_material);
+    bluekazagurumaflame.name = "OBJECTBLUE";
+    blue_kazaguruma.add(bluekazagurumaflame);
+    blue_kazaguruma.name = "OBJECTBLUE";
+    markerRoot.add(blue_kazaguruma);
+
+    //violet風車を表示
+    violet_kazaguruma.position.set(-2, 0, 0);
+    violet_kazaguruma.rotation.x = 90;
+    const violetkazagurumaflame_geometry = new THREE.TorusKnotGeometry(1 * 0.4, 0.2 * 0.4, 20, 3, 3, 5);
+    const violetkazagurumaflame_material = new THREE.MeshBasicMaterial({ color: 0xFFFFFF });
+    violetkazagurumaflame_material.wireframe = true;
+    const violetkazagurumaflame = new THREE.Mesh(violetkazagurumaflame_geometry, violetkazagurumaflame_material);
+    violetkazagurumaflame.name = "OBJECTVIOLET";
+    violet_kazaguruma.add(violetkazagurumaflame);
+    violet_kazaguruma.name = "OBJECTVIOLET";
+    markerRoot.add(violet_kazaguruma);
+
+
+
+    function animate() {
+      requestAnimationFrame(animate);
+      //風車のアニメーション
+      if (redFlg == 1) {
+        red_kazaguruma.rotation.z += Math.PI / 180;
+      }
+      if (greenFlg == 1) {
+        green_kazaguruma.rotation.z += Math.PI / 180;
+      }
+      if (yellowFlg == 1) {
+        yellow_kazaguruma.rotation.z += Math.PI / 180;
+      }
+      if (blueFlg == 1) {
+        blue_kazaguruma.rotation.z += Math.PI / 180;
+      }
+      if (violetFlg == 1) {
+        violet_kazaguruma.rotation.z += Math.PI / 180;
+      }
+
+      renderer.render(scene, camera);
+    }
+    animate();
+
+
+
+    renderer.setAnimationLoop((delta) => {
+      if (arToolkitSource.ready) {
+        arToolkitContext.update(arToolkitSource.domElement);
+      }
+
+      renderer.render(scene, camera);
+    });
+
+    function handleResize() {
+      if (arToolkitSource.ready) {
+        arToolkitSource.onResize();
+        arToolkitSource.copySizeTo(renderer.domElement);
+      }
+
+      renderer.setPixelRatio(window.devicePixelRatio);
+    }
+
+    window.addEventListener("mousedown", function (ret) {
+      let mouseX = ret.clientX;                           // マウスのx座標
+      let mouseY = ret.clientY;                           // マウスのy座標
+      mouseX = (mouseX / window.innerWidth) * 2 - 1;    // -1 ～ +1 に正規化されたx座標
+      mouseY = -(mouseY / window.innerHeight) * 2 + 1;    // -1 ～ +1 に正規化されたy座標
+      let pos = new THREE.Vector3(mouseX, mouseY, 1);     // マウスベクトル
+      pos.unproject(camera);                              // スクリーン座標系をカメラ座標系に変換
+      // レイキャスタを作成（始点, 向きのベクトル）
+      let ray = new THREE.Raycaster(camera.position, pos.sub(camera.position).normalize());
+      let obj = ray.intersectObjects(scene.children, true);   // レイと交差したオブジェクトの取得
+      console.log(obj);
+      console.log(obj[0]);
+      if (obj.length > 0) {                                // 交差したオブジェクトがあれば
+        picked(obj[0].object.name);                       // ピックされた対象に応じた処理を実行
+        console.log(obj[0].object.name)
+        // m01Flg = -1 * m01Flg;
+        console.log("debug 001");
+      }
+      console.log("-----");
+    });
+
+    function picked(objName) {
+      console.log("objName = " + objName);
+      switch (objName) {
+        case "OBJECTRED":
+          console.log("OBJECTRED hit");
+          redFlg = -1 * redFlg;
+          break;
+        case "OBJECTGREEN":
+          console.log("OBJECTGREEN hit");
+          greenFlg = -1 * greenFlg;
+          break;
+        case "OBJECTYELLOW":
+          console.log("OBJECTYELLOW hit");
+          yellowFlg = -1 * yellowFlg;
+          break;
+        case "OBJECTBLUE":
+          console.log("OBJECTBLUE hit");
+          blueFlg = -1 * blueFlg;
+          break;
+        case "OBJECTVIOLET":
+          console.log("OBJECTVIOLET hit");
+          violetFlg = -1 * violetFlg;
+          break;
+        default:
+          break;
+      }
+    }
+  </script>
+</body>
+
+</html>
